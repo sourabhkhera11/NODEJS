@@ -213,5 +213,22 @@
 //   }
 // })();
 
-
 //Q11
+(async () => {
+  try {
+    let str = await fetch("https://jsonplaceholder.typicode.com/users/1");
+    console.log(str);
+    let data = await str.json();
+    console.log(
+      `Name: ${data.name} , email: ${data.email}, City: ${data.address.city}`
+    );
+  } catch (er) {
+    console.log(er.message);
+  }
+})();
+
+// //use of JSON.parse()
+// //Synchronous : only work when string is already in memory
+// let s = '{"name":"Sourabh", "age":21}';
+// let o = JSON.parse(s);
+// console.log(o.name);

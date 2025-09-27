@@ -214,21 +214,65 @@
 // })();
 
 //Q11
-(async () => {
-  try {
-    let str = await fetch("https://jsonplaceholder.typicode.com/users/1");
-    console.log(str);
-    let data = await str.json();
-    console.log(
-      `Name: ${data.name} , email: ${data.email}, City: ${data.address.city}`
-    );
-  } catch (er) {
-    console.log(er.message);
-  }
-})();
+// (async () => {
+//   try {
+//     let str = await fetch("https://jsonplaceholder.typicode.com/users/1");
+//     console.log(str);
+//     let data = await str.json();
+//     console.log(
+//       `Name: ${data.name} , email: ${data.email}, City: ${data.address.city}`
+//     );
+//   } catch (er) {
+//     console.log(er.message);
+//   }
+// })();
 
 // //use of JSON.parse()
 // //Synchronous : only work when string is already in memory
 // let s = '{"name":"Sourabh", "age":21}';
 // let o = JSON.parse(s);
 // console.log(o.name);
+
+// //Q12 (explicit binding of this )
+// //remember here we cant use the arrow function as they dont have its own this substitution we have to create its own function
+// function getAverage() {
+//   let marks = this?.marks;
+//   let a =
+//     marks.reduce((acc, cur) => {
+//       return acc + cur;
+//     }) / marks.length;
+//   return a;
+// }
+// let isPassed = (avg) => {
+//   return avg >= 40 ? "Pass" : "Fail";
+// };
+
+// let student = {
+//   name: "Sourabh",
+//   age: 22,
+//   marks: [95, 95, 84, 74, 76],
+// };
+// let avgM = getAverage.call(student);
+// let status = isPassed(avgM);
+// console.log(`Avg marks= ${avgM} and status = ${status}`);
+
+//Q13 Reversing a string
+//built in method (String doesn't have built in method but array has )
+//reverse of an array
+//reverse is done in place means ar reference store the reverse value
+// let ar = [1, 2, 3, 4, 5];
+// console.log(ar.reverse());
+// console.log(ar);
+
+let s = "javascript";
+//reverse a string (Built in way)
+let ar = s.split("");
+ar.reverse();
+s = ar.join("");
+console.log(s);
+//iterative way
+let ns = "";
+for (let i = s.length - 1; i >= 0; i--) {
+  ns += s[i];
+}
+console.log(ns);

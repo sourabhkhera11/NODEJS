@@ -1,8 +1,10 @@
 //sourabhkhera
 //jpRByHDn3cvc8l9o
+require("dotenv").config();
+// console.log(process.env);
+
 const { MongoClient } = require("mongodb");
-const url =
-  "mongodb+srv://sourabhkhera:jpRByHDn3cvc8l9o@namastenode.9ucfnln.mongodb.net/";
+const url = process.env.MONGO_URI;
 const client = new MongoClient(url);
 const dbname = "Test";
 async function main() {

@@ -8,6 +8,14 @@ app.get("/hello", (req, res) => {
 app.use("/hello", (req, res) => {
   res.send("Hello from hello tab");
 });
+app.get("/user", (req, res) => {
+  res.send("User data is fetched!");
+});
+app.post("/user", (req, res) => {
+  const data = req.body;
+  console.log(data);
+  res.send(`Data is received ${data}`);
+});
 app.use("/", (req, res) => {
   res.send("Hello World");
 });

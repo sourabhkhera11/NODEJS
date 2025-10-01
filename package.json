@@ -1,6 +1,11 @@
 {
+  "scripts": {
+    "dev": "nodemon expserver.js",
+    "start": "node expserver.js "
+  },
   "dependencies": {
     "dotenv": "^17.2.3",
+    "express": "^5.1.0",
     "mongodb": "^6.20.0"
   }
 }

@@ -2,6 +2,9 @@ const express = require("express");
 const app = express();
 require("dotenv").config();
 //Here position metters when we are using the use middleware
+app.get("/hello", (req, res) => {
+  res.send("Post hello");
+});
 app.use("/hello", (req, res) => {
   res.send("Hello from hello tab");
 });

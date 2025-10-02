@@ -33,7 +33,16 @@ app.use("/user/data", (req, res) => {
 });
 //delete a user
 app.use("/user/delete", (req, res) => {
+  throw new Error("HHAHAHHA");
   res.send("Delete user data");
+});
+
+//Global error handler
+app.use("/", (err, req, res, next) => {
+  if (err) {
+    console.log(err); //for us to see whats the error
+    res.status(500).send("Some error is occured!");
+  }
 });
 app.listen(3001, () => {
   console.log("Server is running at 3001");

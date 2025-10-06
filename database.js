@@ -1,5 +1,3 @@
-//sourabhkhera
-//jpRByHDn3cvc8l9o
 require("dotenv").config();
 // console.log(process.env);
 

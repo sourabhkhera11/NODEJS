@@ -31,6 +31,20 @@ app.post("/register", async (req, res) => {
     });
   }
 });
+app.put("/modify/:id", async (req, res) => {
+  const { id } = req.params;
+//   const { firstName, lastName } = req.body;
+  try {
+    await User.findByIdAndUpdate(id, {
+      firstName: "Tushar",
+      lastName: "Verma",
+    });
+    res.status(200).send("User modify successfully");
+  } catch (er) {
+    res.status(400).send("Bad request!");
+  }
+});
+
 dbConnect()
   .then(() => {
     console.log("Successfully connected to DB!");

@@ -64,18 +64,27 @@ app.get("/allUsers", async (req, res) => {
 //Modify data into the database(Update)
 app.put("/modify/:id", async (req, res) => {
   const { id } = req.params;
-  //   const { firstName, lastName } = req.body;
+  const { firstName: fn, lastName: ln } = req.body;
   try {
     await User.findByIdAndUpdate(id, {
-      firstName: "Tushar",
-      lastName: "Verma",
+      firstName: fn,
+      lastName: ln,
     });
     res.status(200).send("User modify successfully");
   } catch (er) {
     res.status(400).send("Bad request!");
   }
 });
-
+//Delete the data from the database
+app.delete("/deleteUser", async (req, res) => {
+  const { phoneNumber: pn } = req.body;
+  try {
+    await User.findOneAndDelete({ phoneNumber: pn });
+    res.status(200).send("User deleted successfully!");
+  } catch (er) {
+    res.status(400).send("Something went wrong!");
+  }
+});
 dbConnect()
   .then(() => {
     console.log("Successfully connected to DB!");

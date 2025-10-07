@@ -34,5 +34,66 @@ router.post("/register", async (req, res) => {
     });
   }
 });
+//Read
+router.get("/information/:hospitalName", async (req, res) => {
+  const { hospitalName: name } = req?.params;
+  try {
+    const data = await hospital.find({ hospitalName: name });
+    res.status(200).send(data);
+  } catch (er) {
+    res.status(400).send({
+      Error: "Something went wrong!",
+      message: er.message,
+    });
+  }
+});
+//Show all hospitals
+router.get("/hospitals", async (req, res) => {
+  const data = await hospital.find({});
+  try {
+    if (!data) {
+      res.status(400).send("Data not present!");
+    } else {
+      res.status(200).send(data);
+    }
+  } catch (er) {
+    res.status(400).send({
+      Error: "Something went wrong!",
+      message: er.message,
+    });
+  }
+});
+//Update the hospital
+//In this you must specify which fields can update which cant
+//Means you need to specify which are the sensitive fields
+router.patch("/update/:id", async (req, res) => {
+  const { id } = req.params;
+  const VALID_FIELDS = [
+    "hospitalName",
+    "totalIcuBeds",
+    "address",
+    "state",
+    "city",
+    "pincode",
+    "pocName",
+    "pocIdProof",
+  ];
+  const data = req.body;
+  try {
+    const result = Object.keys(data).every((value) => {
+      VALID_FIELDS.includes(value);
+    });
+    if (!result) {
+      throw new Error("These fields can't be updated!");
+    }
+    await hospital.findByIdAndUpdate(id, req.body);
+    res.status(200).send("Update successfully!");
+  } catch (er) {
+    res.status(400).send({
+      Error: "Something went wrong!",
+      message: er.message,
+    });
+  }
+});
 
 module.exports = router;

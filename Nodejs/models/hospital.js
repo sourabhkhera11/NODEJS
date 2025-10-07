@@ -1,5 +1,6 @@
 //Step1 Require mongoose file
 const mongoose = require("mongoose");
+const validator = require("validator");
 //Step2 Crating a schema - Schema name should be capital
 const Hospital = mongoose.Schema(
   {
@@ -17,10 +18,16 @@ const Hospital = mongoose.Schema(
       unique: true,
       trim: true,
       lowercase: true,
-      match: [
-        /^\w+([\.-]?\w+)*@\w+([\.-]?\w+)*(\.\w{2,3})+$/,
-        "Please fill a valid email address",
-      ],
+      // match: [
+      //   /^\w+([\.-]?\w+)*@\w+([\.-]?\w+)*(\.\w{2,3})+$/,
+      //   "Please fill a valid email address",
+      // ],
+      validate(value) {
+        const result = validator.isEmail(value);
+        if (!result) {
+          throw new Error("Not a valid email!");
+        }
+      },
     },
     contactNumber: {
       type: String,
@@ -86,12 +93,24 @@ const Hospital = mongoose.Schema(
       required: true,
       unique: true,
       trim: true,
+      validate(value) {
+        const result = validator.isURL(value);
+        if (!result) {
+          throw new Error("Not a valid URL");
+        }
+      },
     },
     licenseCertificate: {
       type: String,
       required: true,
       unique: true,
       trim: true,
+      validate(value) {
+        const result = validator.isURL(value);
+        if (!result) {
+          throw new Error("Not a valid URL");
+        }
+      },
     },
     pocName: {
       type: String,

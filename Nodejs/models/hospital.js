@@ -111,7 +111,7 @@ const Hospital = mongoose.Schema(
       trim: true,
     },
   },
-  { Timestamp: true }
+  { timestamps: true }
 );
 //Step3 - Creating and exporting a model
 module.exports = mongoose.model("Hospital", Hospital);

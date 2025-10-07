@@ -13,12 +13,11 @@ router.use((req, res, next) => {
 });
 //Create
 router.post("/register", async (req, res) => {
-  const { hospitalName, email } = req.body;
-  console.log(hospitalName, email);
-  const instance = new hospital({
-    hospitalName: hospitalName,
-    email: email,
-  });
+  //   const { hospitalName, email } = req.body;
+  //   console.log(req.body);
+
+  //   console.log(hospitalName, email);
+  const instance = new hospital(req.body);
   try {
     await instance.save();
     res.status(201).send({
@@ -29,9 +28,11 @@ router.post("/register", async (req, res) => {
       },
     });
   } catch (err) {
-    res.status(400).send(err);
+    res.status(400).send({
+      Eroor: "Something Went Wrong! endpoint -> /register",
+      message: err.message,
+    });
   }
 });
-
 
 module.exports = router;

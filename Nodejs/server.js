@@ -1,12 +1,16 @@
 const express = require("express");
 const app = express();
 const { dbConnect } = require("./src/database");
+const hospitalRoutes = require("./routes/hospitalRoutes");
 //Here user is an object (model object )
 const User = require("./models/user");
 const morgan = require("morgan");
 //Best practice is ->First database connected then server listen
 app.use(morgan("dev"));
 app.use(express.json());
+
+//Hospital routes
+app.use("/hospital", hospitalRoutes); 
 //Store data into the database (Create)
 app.post("/register", async (req, res) => {
   const { firstName, lastName, age, phoneNumber, address } = req.body;

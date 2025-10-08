@@ -4,7 +4,7 @@ const router = express.Router();
 const bcrypt = require("bcrypt");
 //Step 2)require the hospital model
 const hospital = require("../models/hospital");
-const { registerRoute } = require("../utils/validInput");
+const { registerRoute, loginRoute } = require("../utils/validInput");
 //Step 3)
 router.use(express.json()); //for parsing the content in the express body
 //Hospital Application Middleware
@@ -135,5 +135,28 @@ router.patch("/update/:id", async (req, res) => {
     });
   }
 });
-
+//Login route
+router.post("/login", async (req, res) => {
+  try {
+    const { email, password:pass } = req.body;
+    loginRoute(email);
+    const result = await hospital.findOne({ email: email });
+    // console.log(result);
+    if (!result) {
+      throw new Error("Invalid credentials!H");
+    } else {
+      const valid = await bcrypt.compare(pass, result?.password);
+      if (!valid) {
+        throw new Error("Invalid credentials!P");
+      } else {
+        res.status(200).send("Login Successfully!");
+      }
+    }
+  } catch (er) {
+    res.status(400).send({
+      Error: "Something went wrong ",
+      message: er.message,
+    });
+  }
+});
 module.exports = router;

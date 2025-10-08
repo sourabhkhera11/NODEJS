@@ -6,4 +6,10 @@ const registerRoute = (password) => {
     throw new Error("Password is not strong enough!");
   }
 };
-module.exports = { registerRoute };
+const loginRoute = (email) => {
+  const result = validator.isEmail(email);
+  if (!result) {
+    throw new Error("Not a valid email!");
+  }
+};
+module.exports = { registerRoute, loginRoute };

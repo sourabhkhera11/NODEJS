@@ -56,18 +56,24 @@ const Hospital = mongoose.Schema(
       required: true,
       unique: true,
       trim: true,
+      minLength: 5,
+      maxLength: 100,
     },
     state: {
       type: String,
       required: true,
       trim: true,
       lowercase: true,
+      minLength: 3,
+      maxLength: 30,
     },
     city: {
       type: String,
       required: true,
       trim: true,
       uppercase: true,
+      minLength: 3,
+      maxLength: 30,
     },
     pincode: {
       type: String,
@@ -81,12 +87,16 @@ const Hospital = mongoose.Schema(
       required: true,
       unique: true,
       trim: true,
+      minLength: 5,
+      maxLength: 30,
     },
     licenseNumber: {
       type: String,
       required: true,
       unique: true,
       trim: true,
+      minLength: 5,
+      maxLength: 30,
     },
     registrationCertificate: {
       type: String,
@@ -115,19 +125,28 @@ const Hospital = mongoose.Schema(
     pocName: {
       type: String,
       required: true,
-      unique: true,
       trim: true,
+      minLength: 3,
+      maxLength: 35,
     },
     pocIdProof: {
       type: String,
       required: true,
       unique: true,
       trim: true,
+      validate(value) {
+        const result = validator.isURL(value);
+        if (!result) {
+          throw new Error("Not a vlaid poc ID proof!");
+        }
+      },
     },
     password: {
       type: String,
       required: true,
       trim: true,
+      minLength: 8,
+      maxLength: 500,
     },
   },
   { timestamps: true }

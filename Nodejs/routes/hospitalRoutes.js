@@ -1,8 +1,10 @@
 //step 1) Router function is used to create a mini app , to modularise the express routes
 const express = require("express");
 const router = express.Router();
+const bcrypt = require("bcrypt");
 //Step 2)require the hospital model
 const hospital = require("../models/hospital");
+const { registerRoute } = require("../utils/validInput");
 //Step 3)
 router.use(express.json()); //for parsing the content in the express body
 //Hospital Application Middleware
@@ -13,12 +15,50 @@ router.use((req, res, next) => {
 });
 //Create
 router.post("/register", async (req, res) => {
-  //   const { hospitalName, email } = req.body;
-  //   console.log(req.body);
+  //Best way is fetch each field and check the things in the separate function
+  //But now i don't need it as everything is check at my database level
+  //Only thing i can't check there is password because there password will be hashed
+  //So i will create a separate function to check the password
 
-  //   console.log(hospitalName, email);
-  const instance = new hospital(req.body);
   try {
+    registerRoute(req.body?.password);
+    const {
+      hospitalName,
+      email,
+      contactNumber,
+      hospitalType,
+      totalIcuBeds,
+      address,
+      state,
+      city,
+      pincode,
+      registrationNumber,
+      licenseNumber,
+      registrationCertificate,
+      licenseCertificate,
+      pocName,
+      pocIdProof,
+      password,
+    } = req.body;
+    const pass = await bcrypt.hash(req.body?.password, 10);
+    const instance = new hospital({
+      hospitalName,
+      email,
+      contactNumber,
+      hospitalType,
+      totalIcuBeds,
+      address,
+      state,
+      city,
+      pincode,
+      registrationNumber,
+      licenseNumber,
+      registrationCertificate,
+      licenseCertificate,
+      pocName,
+      pocIdProof,
+      password: pass,
+    });
     await instance.save();
     res.status(201).send({
       message: "Hospital created successfully!",

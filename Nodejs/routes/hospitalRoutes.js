@@ -2,12 +2,16 @@
 const express = require("express");
 const router = express.Router();
 const bcrypt = require("bcrypt");
+const cookieParser = require("cookie-parser");
+const jwt = require("jsonwebtoken");
+require("dotenv").config();
 //Step 2)require the hospital model
 const hospital = require("../models/hospital");
 const { registerRoute, loginRoute } = require("../utils/validInput");
 //Step 3)
 router.use(express.json()); //for parsing the content in the express body
 //Hospital Application Middleware
+router.use(cookieParser()); //By default req.cookies doesn't contain the cookies they first need to be parsed which is done by this default middleware
 router.use((req, res, next) => {
   console.log("Hospital route is working!");
   //   res.status(200).send("Hospital route remember the name !");
@@ -79,7 +83,11 @@ router.get("/information/:hospitalName", async (req, res) => {
   const { hospitalName: name } = req?.params;
   try {
     const data = await hospital.find({ hospitalName: name });
-    res.status(200).send(data);
+    if (data.length === 0) {
+      throw new Error("Hospital not found!");
+    } else {
+      res.status(200).send(data);
+    }
   } catch (er) {
     res.status(400).send({
       Error: "Something went wrong!",
@@ -138,23 +146,51 @@ router.patch("/update/:id", async (req, res) => {
 //Login route
 router.post("/login", async (req, res) => {
   try {
-    const { email, password:pass } = req.body;
+    const { email, password: pass } = req.body;
     loginRoute(email);
     const result = await hospital.findOne({ email: email });
     // console.log(result);
     if (!result) {
-      throw new Error("Invalid credentials!H");
+      throw new Error("Invalid credentials!");
     } else {
       const valid = await bcrypt.compare(pass, result?.password);
       if (!valid) {
-        throw new Error("Invalid credentials!P");
+        throw new Error("Invalid credentials!");
       } else {
-        res.status(200).send("Login Successfully!");
+        // console.log(result?._id);
+        const token = await jwt.sign(
+          { _id: result._id },
+          process.env.JWT_SECRET
+        );
+        res.status(200).cookie("token", token).send("Login Successfully!");
       }
     }
   } catch (er) {
     res.status(400).send({
       Error: "Something went wrong ",
+      message: er.message,
+    });
+  }
+});
+
+//profile route
+router.get("/profile", async (req, res) => {
+  try {
+    const { token } = req.cookies;
+    console.log(token);
+
+    if (!token) {
+      throw new Error("Not authorized!");
+    }
+    const { _id } = await jwt.verify(token, process.env.JWT_SECRET);
+    const hos = await hospital.find({ _id: _id });
+    if (hos.length === 0) {
+      throw new Error("Not a valid Hospital!");
+    }
+    res.status(200).send(hos);
+  } catch (er) {
+    res.status(400).send({
+      Error: "Something went wrong!",
       message: er.message,
     });
   }

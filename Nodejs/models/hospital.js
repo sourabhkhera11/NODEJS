@@ -1,6 +1,9 @@
 //Step1 Require mongoose file
 const mongoose = require("mongoose");
 const validator = require("validator");
+const bcrypt = require("bcrypt");
+const cookieParser = require("cookie-parser");
+const jwt = require("jsonwebtoken");
 //Step2 Crating a schema - Schema name should be capital
 const Hospital = mongoose.Schema(
   {
@@ -151,5 +154,13 @@ const Hospital = mongoose.Schema(
   },
   { timestamps: true }
 );
+//Step4) creating schema methods
+Hospital.methods.generateJWT = async function () {
+  const token = await jwt.sign({ _id: this._id }, process.env.JWT_SECRET);
+  return token;
+};
+
+
+
 //Step3 - Creating and exporting a model
 module.exports = mongoose.model("Hospital", Hospital);

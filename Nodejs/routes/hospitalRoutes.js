@@ -149,6 +149,7 @@ router.post("/login", async (req, res) => {
   try {
     const { email, password: pass } = req.body;
     loginRoute(email);
+    //result is the instance of the hospital
     const result = await hospital.findOne({ email: email });
     // console.log(result);
     if (!result) {
@@ -159,10 +160,7 @@ router.post("/login", async (req, res) => {
         throw new Error("Invalid credentials!");
       } else {
         // console.log(result?._id);
-        const token = await jwt.sign(
-          { _id: result._id },
-          process.env.JWT_SECRET
-        );
+        const token = await result.generateJWT();
         res
           .status(200)
           .cookie("token", token, {

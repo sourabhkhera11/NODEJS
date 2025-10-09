@@ -163,7 +163,13 @@ router.post("/login", async (req, res) => {
           { _id: result._id },
           process.env.JWT_SECRET
         );
-        res.status(200).cookie("token", token).send("Login Successfully!");
+        res
+          .status(200)
+          .cookie("token", token, {
+            httpOnly: true,
+            expires: new Date(Date.now() + 7 * 24 * 3600000),
+          })
+          .send("Login Successfully!");
       }
     }
   } catch (er) {

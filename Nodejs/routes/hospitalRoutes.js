@@ -4,9 +4,10 @@ const router = express.Router();
 const bcrypt = require("bcrypt");
 const cookieParser = require("cookie-parser");
 const jwt = require("jsonwebtoken");
-require("dotenv").config();
+// require("dotenv").config();
 //Step 2)require the hospital model
 const hospital = require("../models/hospital");
+const { hospitalAuth } = require("../middleware/auth");
 const { registerRoute, loginRoute } = require("../utils/validInput");
 //Step 3)
 router.use(express.json()); //for parsing the content in the express body
@@ -174,20 +175,30 @@ router.post("/login", async (req, res) => {
 });
 
 //profile route
-router.get("/profile", async (req, res) => {
+router.get("/profile", hospitalAuth, async (req, res) => {
   try {
-    const { token } = req.cookies;
-    console.log(token);
+    const result = req.result;
+    res.status(200).send(result);
+  } catch (er) {
+    res.status(400).send({
+      Error: "Something went wrong!",
+      message: er.message,
+    });
+  }
+});
 
-    if (!token) {
-      throw new Error("Not authorized!");
-    }
-    const { _id } = await jwt.verify(token, process.env.JWT_SECRET);
-    const hos = await hospital.find({ _id: _id });
-    if (hos.length === 0) {
-      throw new Error("Not a valid Hospital!");
-    }
-    res.status(200).send(hos);
+//Sent connection request
+router.get("/pocInfo", hospitalAuth, async (req, res) => {
+  try {
+    const result = req.result;
+    const { pocName, pocIdProof } = result;
+    res.status(200).send({
+      message: "Poc contact details!",
+      data: {
+        pocName,
+        pocIdProof,
+      },
+    });
   } catch (er) {
     res.status(400).send({
       Error: "Something went wrong!",

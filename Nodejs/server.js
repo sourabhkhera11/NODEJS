@@ -1,3 +1,4 @@
+require("dotenv").config();
 const express = require("express");
 const app = express();
 const { dbConnect } = require("./src/database");
@@ -8,9 +9,8 @@ const morgan = require("morgan");
 //Best practice is ->First database connected then server listen
 app.use(morgan("dev"));
 app.use(express.json());
-
 //Hospital routes
-app.use("/hospital", hospitalRoutes); 
+app.use("/hospital", hospitalRoutes);
 //Store data into the database (Create)
 app.post("/register", async (req, res) => {
   const { firstName, lastName, age, phoneNumber, address } = req.body;

@@ -10,8 +10,9 @@ const hospital = require("../models/hospital");
 const { hospitalAuth } = require("../middleware/auth");
 const {
   registerRoute,
-  loginRoute,
+  isValidEmail,
   updateRoute,
+  validChangePassword,
 } = require("../utils/validInput");
 //Step 3)
 router.use(express.json()); //for parsing the content in the express body
@@ -136,7 +137,7 @@ router.patch("/update", hospitalAuth, async (req, res) => {
 router.post("/login", async (req, res) => {
   try {
     const { email, password: pass } = req.body;
-    loginRoute(email);
+    isValidEmail(email);
     //result is the instance of the hospital
     const result = await hospital.findOne({ email: email });
     // console.log(result);
@@ -207,5 +208,21 @@ router.post("/logout", (req, res) => {
     .cookie("token", null, { expires: new Date(Date.now()) })
     .status(200)
     .send("Logout Successfully!");
+});
+
+//Update password
+router.post("/changePassword", hospitalAuth, async (req, res) => {
+  try {
+    await validChangePassword(req);
+    const { _id } = req.result;
+    const hashPassword = await bcrypt.hash(req.body?.newPassword, 10);
+    await hospital.findByIdAndUpdate(_id , { password: hashPassword });
+    res.status(201).send("Password change successfuly");
+  } catch (er) {
+    res.status(400).send({
+      Error: "There is an Error while updating the password",
+      message: er.message,
+    });
+  }
 });
 module.exports = router;

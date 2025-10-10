@@ -1,13 +1,12 @@
 const validator = require("validator");
-const { hospitalAuth } = require("../middleware/auth");
-
+const bcrypt = require("bcrypt");
 const registerRoute = (password) => {
   const result = validator.isStrongPassword(password);
   if (!result) {
     throw new Error("Password is not strong enough!");
   }
 };
-const loginRoute = (email) => {
+const isValidEmail = (email) => {
   const result = validator.isEmail(email);
   if (!result) {
     throw new Error("Not a valid email!");
@@ -53,4 +52,21 @@ const updateRoute = (req) => {
     throw new Error("Not a valid pocName name!");
   }
 };
-module.exports = { registerRoute, loginRoute, updateRoute };
+const validChangePassword = async (req) => {
+  const { currentPassword, newPassword } = req.body;
+
+  const { _id, password } = req.result;
+  const status =await bcrypt.compare(currentPassword, password);
+  if (!status) {
+    throw new Error("Invlaid password!");
+  }
+  if (!validator.isStrongPassword(newPassword)) {
+    throw new Error("Not a strong Password!");
+  }
+};
+module.exports = {
+  registerRoute,
+  isValidEmail,
+  updateRoute,
+  validChangePassword,
+};

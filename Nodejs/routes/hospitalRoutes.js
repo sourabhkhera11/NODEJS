@@ -79,7 +79,7 @@ router.post("/register", async (req, res) => {
     });
   }
 });
-//Read
+//Read(Old one no need now !)
 router.get("/information/:hospitalName", async (req, res) => {
   const { hospitalName: name } = req?.params;
   try {
@@ -96,7 +96,7 @@ router.get("/information/:hospitalName", async (req, res) => {
     });
   }
 });
-//Show all hospitals
+//Show all hospitals(This route should be for admin not to hospital )
 router.get("/hospitals", async (req, res) => {
   const data = await hospital.find({});
   try {
@@ -115,8 +115,8 @@ router.get("/hospitals", async (req, res) => {
 //Update the hospital
 //In this you must specify which fields can update which cant
 //Means you need to specify which are the sensitive fields
-router.patch("/update/:id", async (req, res) => {
-  const { id } = req.params;
+router.patch("/update", hospitalAuth, async (req, res) => {
+  const { _id } = req.result;
   const VALID_FIELDS = [
     "hospitalName",
     "totalIcuBeds",
@@ -129,13 +129,11 @@ router.patch("/update/:id", async (req, res) => {
   ];
   const data = req.body;
   try {
-    const result = Object.keys(data).every((value) => {
-      VALID_FIELDS.includes(value);
-    });
-    if (!result) {
+    var r = Object.keys(data).every((value) => VALID_FIELDS.includes(value));
+    if (!r) {
       throw new Error("These fields can't be updated!");
     }
-    await hospital.findByIdAndUpdate(id, req.body);
+    await hospital.findByIdAndUpdate(_id, req.body);
     res.status(200).send("Update successfully!");
   } catch (er) {
     res.status(400).send({
@@ -191,7 +189,7 @@ router.get("/profile", hospitalAuth, async (req, res) => {
   }
 });
 
-//Sent connection request
+//Get POC information
 router.get("/pocInfo", hospitalAuth, async (req, res) => {
   try {
     const result = req.result;
@@ -209,5 +207,15 @@ router.get("/pocInfo", hospitalAuth, async (req, res) => {
       message: er.message,
     });
   }
+});
+
+//Logout Route
+//No need to authenticate here or to check for any kind of error
+//One thing -> Logout is also treated as a cleanup function, to free up the resources
+router.post("/logout", (req, res) => {
+  res
+    .cookie("token", null, { expires: new Date(Date.now()) })
+    .status(200)
+    .send("Logout Successfully!");
 });
 module.exports = router;

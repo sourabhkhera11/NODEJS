@@ -8,7 +8,11 @@ const jwt = require("jsonwebtoken");
 //Step 2)require the hospital model
 const hospital = require("../models/hospital");
 const { hospitalAuth } = require("../middleware/auth");
-const { registerRoute, loginRoute } = require("../utils/validInput");
+const {
+  registerRoute,
+  loginRoute,
+  updateRoute,
+} = require("../utils/validInput");
 //Step 3)
 router.use(express.json()); //for parsing the content in the express body
 //Hospital Application Middleware
@@ -117,22 +121,8 @@ router.get("/hospitals", async (req, res) => {
 //Means you need to specify which are the sensitive fields
 router.patch("/update", hospitalAuth, async (req, res) => {
   const { _id } = req.result;
-  const VALID_FIELDS = [
-    "hospitalName",
-    "totalIcuBeds",
-    "address",
-    "state",
-    "city",
-    "pincode",
-    "pocName",
-    "pocIdProof",
-  ];
-  const data = req.body;
   try {
-    var r = Object.keys(data).every((value) => VALID_FIELDS.includes(value));
-    if (!r) {
-      throw new Error("These fields can't be updated!");
-    }
+    updateRoute(req);
     await hospital.findByIdAndUpdate(_id, req.body);
     res.status(200).send("Update successfully!");
   } catch (er) {

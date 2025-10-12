@@ -1,5 +1,7 @@
 const validator = require("validator");
 const bcrypt = require("bcrypt");
+const connectedHospitals = require("../models/connectedHospitals");
+const hospital = require("../models/hospital");
 const registerRoute = (password) => {
   const result = validator.isStrongPassword(password);
   if (!result) {
@@ -56,7 +58,7 @@ const validChangePassword = async (req) => {
   const { currentPassword, newPassword } = req.body;
 
   const { _id, password } = req.result;
-  const status =await bcrypt.compare(currentPassword, password);
+  const status = await bcrypt.compare(currentPassword, password);
   if (!status) {
     throw new Error("Invlaid password!");
   }
@@ -64,9 +66,37 @@ const validChangePassword = async (req) => {
     throw new Error("Not a strong Password!");
   }
 };
+//If one hospital1 sent request to hospital2 , then hospital2 can't send the request to hospital1 it can only accept or reject now
+const validRequest = async (fromHospitalId, toHospitalId) => {
+  const data = await connectedHospitals.find({
+    $or: [
+      { fromHospitalId, toHospitalId },
+      { fromHospitalId: toHospitalId, toHospitalId: fromHospitalId },
+    ],
+  });
+  console.log(data);
+  if (data.length != 0) {
+    throw new Error("You can't sent request to this person!");
+  }
+};
+const validStatus = (status) => {
+  const list = ["ignored", "interested"];
+  if (!list.includes(status)) {
+    throw new Error("Not a valid status !");
+  }
+};
+const validHospital = async (hosId) => {
+  const data = await hospital.findOne({ _id: hosId });
+  if (!data) {
+    throw new Error("Not a valid hospital whom you are sending request!");
+  }
+};
 module.exports = {
   registerRoute,
   isValidEmail,
   updateRoute,
   validChangePassword,
+  validRequest,
+  validStatus,
+  validHospital,
 };

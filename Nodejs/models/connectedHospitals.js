@@ -28,4 +28,15 @@ const connectedHospitals = mongoose.Schema({
   },
 });
 
+//Compound Indexing as here we will search for the connection between two ids
+connectedHospitals.index({ fromHospitalId: 1, toHospitalId: 1 });
+
+//Schema pre fuctions
+//Cant send the request to yourself
+connectedHospitals.pre("save", function (next) {
+  if (this.fromHospitalId.equals(this.toHospitalId)) {
+    throw new Error("You can't sent request to yourself!");
+  }
+  next();
+});
 module.exports = mongoose.model("connectedHospitals", connectedHospitals);

@@ -23,13 +23,9 @@ const connectedHospitals = mongoose.Schema({
     type: String,
     enum: {
       values: ["ignored", "interested", "accepted", "rejected"],
-      message: `${value} can't be value of the status!`,
+      message: "{VALUE} can't be value of the status!",
     },
   },
 });
 
-const connectedHospitalsModel = mongoose.model(
-  "connectedHospitals",
-  connectedHospitals
-);
-module.exports = connectedHospitalsModel;
+module.exports = mongoose.model("connectedHospitals", connectedHospitals);

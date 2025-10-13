@@ -35,6 +35,10 @@ router.get("/pending", hospitalAuth, async (req, res) => {
   }
 });
 //To view all the connected hospitals
+/*things to keep in mind
+1)Not shown its own profile 
+2)Not shown anybody who is already connected
+ */
 router.get("/connected", hospitalAuth, async (req, res) => {
   try {
     const { _id } = req.result;
@@ -63,6 +67,23 @@ router.get("/connected", hospitalAuth, async (req, res) => {
       message: "All the connected hospitals are:",
       data: merge,
     });
+  } catch (er) {
+    res.status(400).send({
+      error: "Something went wrong!",
+      message: er.message,
+    });
+  }
+});
+router.get("/activity", hospitalAuth, async (req, res) => {
+  try {
+    const { _id: loginId } = req.result;
+    const linkedHos = await connectedHospitals
+      .find({
+        $or: [{ fromHospitalId: loginId }, { toHospitalId: loginId }],
+      })
+      .populate("fromHospitalId","hospitalName")
+      .populate("toHospitalId","hospitalName");
+    res.status(200).send(linkedHos);
   } catch (er) {
     res.status(400).send({
       error: "Something went wrong!",

@@ -34,4 +34,40 @@ router.get("/pending", hospitalAuth, async (req, res) => {
     });
   }
 });
+//To view all the connected hospitals
+router.get("/connected", hospitalAuth, async (req, res) => {
+  try {
+    const { _id } = req.result;
+    const data1 = await connectedHospitals
+      .find({
+        toHospitalId: _id,
+        status: "accepted",
+      })
+      .populate("fromHospitalId", "hospitalName");
+    // console.log(data);
+    const filter1 = data1.map((value) => {
+      return value?.fromHospitalId?.hospitalName;
+    });
+    const data2 = await connectedHospitals
+      .find({
+        fromHospitalId: _id,
+        status: "accepted",
+      })
+      .populate("toHospitalId", "hospitalName");
+    // console.log(data);
+    const filter2 = data2.map((value) => {
+      return value?.fromHospitalId?.hospitalName;
+    });
+    const merge = [...filter1, ...filter2];
+    res.status(200).send({
+      message: "All the connected hospitals are:",
+      data: merge,
+    });
+  } catch (er) {
+    res.status(400).send({
+      error: "Something went wrong!",
+      message: er.message,
+    });
+  }
+});
 module.exports = router;

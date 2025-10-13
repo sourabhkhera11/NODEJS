@@ -74,7 +74,7 @@ const validRequest = async (fromHospitalId, toHospitalId) => {
       { fromHospitalId: toHospitalId, toHospitalId: fromHospitalId },
     ],
   });
-  console.log(data);
+  // console.log(data);
   if (data.length != 0) {
     throw new Error("You can't sent request to this person!");
   }
@@ -91,6 +91,29 @@ const validHospital = async (hosId) => {
     throw new Error("Not a valid hospital whom you are sending request!");
   }
 };
+
+const validReview = async (status, fromHospitalId, toHospitalId) => {
+  const list = ["accepted", "rejected"];
+  if (!list.includes(status)) {
+    throw new Error("Not a valid status!");
+  }
+  if (!(await hospital.findOne({ _id: fromHospitalId }))) {
+    throw new Error("Not a valid requestId /fromHospitalId");
+  }
+  const data = await connectedHospitals.findOne({
+    fromHospitalId: fromHospitalId,
+    toHospitalId: toHospitalId,
+  });
+  if(!data){
+    throw new Error("Connection is not already exist!")
+  }
+  if (data?.status != "interested") {
+    throw new Error("Not a valid request");
+  }
+  // console.log(data);
+
+  return data;
+};
 module.exports = {
   registerRoute,
   isValidEmail,
@@ -99,4 +122,5 @@ module.exports = {
   validRequest,
   validStatus,
   validHospital,
+  validReview,
 };

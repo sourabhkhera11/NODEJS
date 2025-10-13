@@ -16,7 +16,7 @@ const connectionRoutes = require("./routes/connectionRoutes");
 const User = require("./models/user");
 //Various subroute setup
 app.use("/hospital", hospitalRoutes);
-app.use("/connection/send", connectionRoutes);
+app.use("/connection", connectionRoutes);
 //Store data into the database (Create)
 app.post("/register", async (req, res) => {
   const { firstName, lastName, age, phoneNumber, address } = req.body;

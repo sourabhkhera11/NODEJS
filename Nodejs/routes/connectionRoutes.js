@@ -6,6 +6,7 @@ const {
   validRequest,
   validStatus,
   validHospital,
+  validReview,
 } = require("../utils/validInput");
 //Router level middlewares
 router.use("/", (req, res, next) => {
@@ -24,7 +25,7 @@ various edge cases that we take care of
 6)Used compound indexing for searching together using toHos and fromHos
 7)Used the schema pre function 
 8)Used the mongoDb queries like or and etc */
-router.post("/:status/:toHospitalId", hospitalAuth, async (req, res) => {
+router.post("/send/:status/:toHospitalId", hospitalAuth, async (req, res) => {
   try {
     const { status, toHospitalId } = req.params;
     const { _id: fromHospitalId } = req.result?._id;
@@ -47,4 +48,39 @@ router.post("/:status/:toHospitalId", hospitalAuth, async (req, res) => {
     });
   }
 });
+
+//Accept or reject the connection request
+/* 
+Higher level -> User data validation 
+1)Auth toHospitalId must be login ✔
+2)Valid status -> Accepted / Rejected ✔
+3)Valid fromHospitalId must be there in the database✔ 
+Lower level
+4)fromHospitalId and tohospitalId exist in the database and there status must be interested ✔
+ */
+router.patch(
+  "/review/:status/:fromHospitalId",
+  hospitalAuth,
+  async (req, res) => {
+    try {
+      const { status, fromHospitalId } = req.params;
+      const { _id: toHospitalId } = req.result?._id;
+      const data = await validReview(status, fromHospitalId, toHospitalId);
+      console.log(data);
+      
+      console.log(data?._id);
+
+      await connectedHospitals.updateOne(
+        { _id: data?._id },
+        { $set: { status: status } }
+      );
+      res.status(200).send(`Connection request is ${status}`);
+    } catch (Er) {
+      res.status(400).send({
+        Error: "Something went wrong!",
+        message: Er.message,
+      });
+    }
+  }
+);
 module.exports = router;

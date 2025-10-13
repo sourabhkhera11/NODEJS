@@ -95,11 +95,17 @@ router.get("/activity", hospitalAuth, async (req, res) => {
 router.get("/home", hospitalAuth, async (req, res) => {
   try {
     const { _id: loginId } = req.result;
+    const page = parseInt(req.query?.page) || 1;
+    let limit = parseInt(req.query?.limit) || 10;
+    //Sanitizing the limit 
+    limit = limit > 50 ? 50 : limit;
+    const skip = (page - 1) * limit;
     const linkedHos = await connectedHospitals
       .find({
         $or: [{ fromHospitalId: loginId }, { toHospitalId: loginId }],
       })
       .select("fromHospitalId toHospitalId");
+
     const hideIds = new Set();
     linkedHos.forEach((element) => {
       hideIds.add(element?.fromHospitalId.toString());
@@ -109,7 +115,9 @@ router.get("/home", hospitalAuth, async (req, res) => {
       .find({
         _id: { $nin: Array.from(hideIds) },
       })
-      .select("hospitalName");
+      .select("hospitalName")
+      .skip(skip)
+      .limit(limit);
     // console.log(hideIds);
     res.status(200).send(feed);
   } catch (er) {

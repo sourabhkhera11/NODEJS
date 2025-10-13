@@ -2,6 +2,7 @@ const express = require("express");
 const router = express.Router();
 const { hospitalAuth } = require("../middleware/auth");
 const connectedHospitals = require("../models/connectedHospitals");
+const hospitals = require("../models/hospital");
 //Application level api
 router.use("/", (req, res, next) => {
   console.log("Feed API's working fine!");
@@ -81,9 +82,36 @@ router.get("/activity", hospitalAuth, async (req, res) => {
       .find({
         $or: [{ fromHospitalId: loginId }, { toHospitalId: loginId }],
       })
-      .populate("fromHospitalId","hospitalName")
-      .populate("toHospitalId","hospitalName");
+      .populate("fromHospitalId", "hospitalName")
+      .populate("toHospitalId", "hospitalName");
     res.status(200).send(linkedHos);
+  } catch (er) {
+    res.status(400).send({
+      error: "Something went wrong!",
+      message: er.message,
+    });
+  }
+});
+router.get("/home", hospitalAuth, async (req, res) => {
+  try {
+    const { _id: loginId } = req.result;
+    const linkedHos = await connectedHospitals
+      .find({
+        $or: [{ fromHospitalId: loginId }, { toHospitalId: loginId }],
+      })
+      .select("fromHospitalId toHospitalId");
+    const hideIds = new Set();
+    linkedHos.forEach((element) => {
+      hideIds.add(element?.fromHospitalId.toString());
+      hideIds.add(element?.toHospitalId.toString());
+    });
+    const feed = await hospitals
+      .find({
+        _id: { $nin: Array.from(hideIds) },
+      })
+      .select("hospitalName");
+    // console.log(hideIds);
+    res.status(200).send(feed);
   } catch (er) {
     res.status(400).send({
       error: "Something went wrong!",

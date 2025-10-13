@@ -12,11 +12,13 @@ app.use(cookieParser());
 //Subroutes
 const hospitalRoutes = require("./routes/hospitalRoutes");
 const connectionRoutes = require("./routes/connectionRoutes");
+const feedRoutes = require("./routes/feedRoutes");
 //Here user is an object (model object )
 const User = require("./models/user");
 //Various subroute setup
 app.use("/hospital", hospitalRoutes);
 app.use("/connection", connectionRoutes);
+app.use("/feed", feedRoutes);
 //Store data into the database (Create)
 app.post("/register", async (req, res) => {
   const { firstName, lastName, age, phoneNumber, address } = req.body;

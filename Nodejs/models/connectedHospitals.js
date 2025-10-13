@@ -13,11 +13,13 @@ const connectedHospitals = mongoose.Schema({
     type: mongoose.Schema.Types.ObjectId,
     required: true,
     trim: true,
+    ref: "Hospital",
   },
   toHospitalId: {
     type: mongoose.Schema.Types.ObjectId,
     required: true,
     trim: true,
+    ref: "Hospital",
   },
   status: {
     type: String,

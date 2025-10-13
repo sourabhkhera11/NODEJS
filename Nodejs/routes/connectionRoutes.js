@@ -58,8 +58,9 @@ Higher level -> User data validation
 Lower level
 4)fromHospitalId and tohospitalId exist in the database and there status must be interested ✔
  */
+//this api has lot of performance issues
 router.patch(
-  "/review/:status/:fromHospitalId",
+  "/reviewold/:status/:fromHospitalId",
   hospitalAuth,
   async (req, res) => {
     try {
@@ -67,7 +68,7 @@ router.patch(
       const { _id: toHospitalId } = req.result?._id;
       const data = await validReview(status, fromHospitalId, toHospitalId);
       console.log(data);
-      
+
       console.log(data?._id);
 
       await connectedHospitals.updateOne(
@@ -83,4 +84,35 @@ router.patch(
     }
   }
 );
+//New api with optimised way
+router.patch("/review/:status/:requestId", hospitalAuth, async (req, res) => {
+  try {
+    const { status, requestId } = req.params;
+    const { _id: toHospitalId } = req.result;
+    // console.log(toHospitalId);
+
+    const list = ["accepted", "rejected"];
+    if (!list.includes(status)) {
+      throw new Error("Not a valid status!");
+    }
+    const data = await connectedHospitals.findOne({
+      _id: requestId,
+      toHospitalId: toHospitalId,
+      status: "interested",
+    });
+    // console.log(data);
+
+    if (!data) {
+      throw new Error("Not a valid request!");
+    }
+    data.status = status;
+    data.save();
+    res.status(200).send(`Connection request is ${status}`);
+  } catch (er) {
+    res.status(400).send({
+      error: "Something went wrong",
+      message: er.message,
+    });
+  }
+});
 module.exports = router;

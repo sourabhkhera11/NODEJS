@@ -1,10 +1,10 @@
+import NavBar from "./components/NavBar.jsx";
 function App() {
-
   return (
     <>
-      <h1 className="bg-amber-300 text-2xl font-extrabold">Hello World</h1>
+      <NavBar />
     </>
-  )
+  );
 }
 
-export default App
+export default App;

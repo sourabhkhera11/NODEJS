@@ -156,7 +156,7 @@ router.post("/login", async (req, res) => {
             httpOnly: true,
             expires: new Date(Date.now() + 7 * 24 * 3600000),
           })
-          .send("Login Successfully!");
+          .send(result);
       }
     }
   } catch (er) {
@@ -216,7 +216,7 @@ router.post("/changePassword", hospitalAuth, async (req, res) => {
     await validChangePassword(req);
     const { _id } = req.result;
     const hashPassword = await bcrypt.hash(req.body?.newPassword, 10);
-    await hospital.findByIdAndUpdate(_id , { password: hashPassword });
+    await hospital.findByIdAndUpdate(_id, { password: hashPassword });
     res.status(201).send("Password change successfuly");
   } catch (er) {
     res.status(400).send({

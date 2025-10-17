@@ -12,7 +12,7 @@ const Login = () => {
       const data = await axios.post("http://localhost:4000/hospital/login", {
         email,
         password,
-      });
+      },{withCredentials:true});
       console.log(data);
     } catch (e) {
       console.error(e);

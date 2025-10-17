@@ -1,10 +1,16 @@
 //Application level dependencies
 require("dotenv").config();
 const express = require("express");
+const cors = require("cors");
 const app = express();
 const { dbConnect } = require("./src/database");
 const morgan = require("morgan");
 const cookieParser = require("cookie-parser");
+// Apply CORS middleware
+app.use(cors({
+  origin:"http://localhost:5173",
+  credentials:true
+}));
 //Built in middlewares
 app.use(morgan("dev")); //To log each request on the console
 app.use(express.json()); //To parse the content in the req body form json to object
